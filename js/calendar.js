@@ -184,3 +184,60 @@ document.querySelectorAll('.day').forEach(day => {
     icon.textContent = '🔒';
   }
 });
+
+// ===== Falling petals on Feb 14 =====
+if (currentDay >= 14) {
+  const petalsContainer = document.querySelector('.petals');
+
+  // Для равномерного распределения по ширине
+  let petalIndex = 0;
+  const PETALS_PER_CYCLE = 16; // можно менять для более/менее равномерности
+
+  function createPetal() {
+    const petal = document.createElement('div');
+    petal.classList.add('petal');
+
+    // Равномерно по ширине + небольшой рандом
+    const baseLeft = (petalIndex % PETALS_PER_CYCLE) * (100 / PETALS_PER_CYCLE);
+    const randomOffset = (Math.random() - 0.5) * (100 / PETALS_PER_CYCLE * 0.7); // до ±35% ширины сектора
+    let left = baseLeft + randomOffset;
+    left = Math.max(0, Math.min(100, left));
+    petal.style.left = left + '%';
+    petalIndex++;
+
+    // Лепесток появляется за пределами экрана сверху
+    petal.style.top = '-12%';
+
+    const size = 10 + Math.random() * 8;
+    petal.style.width = size + 'px';
+    petal.style.height = size + 'px';
+
+    const duration = 12 + Math.random() * 10;
+    petal.style.animationDuration = duration + 's';
+
+    // Задержка появления, чтобы не было резких всплесков
+    petal.style.animationDelay = Math.random() * 5 + 's';
+
+    petal.innerHTML = `
+      <svg viewBox="0 0 100 100">
+        <path
+          d="M50 10
+             C65 25, 90 40, 50 90
+             C10 40, 35 25, 50 10Z"
+          fill="rgba(236, 72, 153, 0.65)"
+        />
+      </svg>
+    `;
+
+    petalsContainer.appendChild(petal);
+
+    // Удаляем лепесток только после того, как он полностью скроется за нижней границей экрана
+    setTimeout(() => {
+      petal.remove();
+    }, (duration + 1) * 1000); // +1 секунда для гарантии ухода за экран
+  }
+
+  // создаём лепестки постепенно
+  setInterval(createPetal, 900);
+}
+

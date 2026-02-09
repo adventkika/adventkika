@@ -9,6 +9,46 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
   display: none;
 }
 
+/* ===== Falling petals (Feb 14) ===== */
+
+.petals {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.petal {
+  position: absolute;
+  top: -10%;
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
+  animation-name: fallPetal;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.petal svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes fallPetal {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(40px) translateY(120vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+
 /* ===== Flowers background ===== */
 .flowers {
   position: fixed;

@@ -21,6 +21,7 @@
 </html>
 
 --- css/main.css ---
+
 /* Hide scrollbars for all elements */
 html, body, * {
   scrollbar-width: none; /* Firefox */
@@ -39,12 +40,12 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
 }
 
 .flower {
-  transform: scale(var(--flower-scale));
+  /* Используем кастомные свойства для масштаба и поворота */
+  transform: scale(var(--flower-scale, 1)) rotate(var(--flower-rotation, -20deg));
   position: absolute;
   width: 52px;
   height: 52px;
   opacity: 0;
-  transform: scale(0.2) rotate(-20deg);
   transition: opacity 1s ease, transform 1.2s cubic-bezier(0.23,1,0.32,1);
   animation-name: organicSway;
   animation-timing-function: ease-in-out;
@@ -54,7 +55,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
 
 .flower.bloomed {
   opacity: 0.9;
-  transform: scale(1) rotate(0deg);
+  /* Сохраняем индивидуальный поворот */
+  transform: scale(1) rotate(var(--flower-rotation, 0deg));
 }
 
 .flower svg {
@@ -297,43 +299,103 @@ h1 {
     transform:
       translate(0px, 0px)
       rotate(-1deg)
-      scale(var(--flower-scale));
+      scale(var(--flower-scale, 1))
+      rotate(var(--flower-rotation, 0deg));
   }
   20% {
     transform:
       translate(2px, -3px)
       rotate(0.5deg)
-      scale(var(--flower-scale));
+      scale(var(--flower-scale, 1))
+      rotate(var(--flower-rotation, 0deg));
   }
   40% {
     transform:
       translate(-2px, -1px)
       rotate(1deg)
-      scale(var(--flower-scale));
+      scale(var(--flower-scale, 1))
+      rotate(var(--flower-rotation, 0deg));
   }
   60% {
     transform:
       translate(1px, 2px)
       rotate(-0.5deg)
-      scale(var(--flower-scale));
+      scale(var(--flower-scale, 1))
+      rotate(var(--flower-rotation, 0deg));
   }
   80% {
     transform:
       translate(-1px, 1px)
       rotate(0.5deg)
-      scale(var(--flower-scale));
+      scale(var(--flower-scale, 1))
+      rotate(var(--flower-rotation, 0deg));
   }
   100% {
     transform:
       translate(0px, 0px)
       rotate(-1deg)
-      scale(var(--flower-scale));
+      scale(var(--flower-scale, 1))
+      rotate(var(--flower-rotation, 0deg));
   }
 }
 
----js/calendar.js---
+
+---js\calendar.js---
 const today = new Date();
 const currentDay = 14;
+
+// Добавляем коэффициенты вероятности для каждого варианта цветка
+const flowerVariants = [
+  {
+    svg: `
+      <svg viewBox="0 0 100 100">
+        <circle class="center" cx="50" cy="50" r="12" />
+        <ellipse class="petal" cx="50" cy="20" rx="10" ry="20" />
+        <ellipse class="petal" cx="50" cy="80" rx="10" ry="20" />
+        <ellipse class="petal" cx="20" cy="50" rx="20" ry="10" />
+        <ellipse class="petal" cx="80" cy="50" rx="20" ry="10" />
+        <ellipse class="petal" cx="30" cy="30" rx="12" ry="18" transform="rotate(-45 30 30)" />
+        <ellipse class="petal" cx="70" cy="30" rx="12" ry="18" transform="rotate(45 70 30)" />
+        <ellipse class="petal" cx="30" cy="70" rx="12" ry="18" transform="rotate(45 30 70)" />
+        <ellipse class="petal" cx="70" cy="70" rx="12" ry="18" transform="rotate(-45 70 70)" />
+      </svg>
+    `,
+    probability: 0.53 // коэффициент вероятности появления
+  },
+  {
+    svg: `
+      <svg viewBox="0 0 100 100">
+        <g>
+          <ellipse cx="50" cy="30" rx="14" ry="18" fill="#b9a3e3" />
+          <ellipse cx="70" cy="50" rx="14" ry="18" fill="#b9a3e3" transform="rotate(90 70 50)" />
+          <ellipse cx="50" cy="70" rx="14" ry="18" fill="#b9a3e3" />
+          <ellipse cx="30" cy="50" rx="14" ry="18" fill="#b9a3e3" transform="rotate(90 30 50)" />
+          <circle cx="50" cy="50" r="7" fill="#f4728e" />
+        </g>
+      </svg>
+    `,
+    probability: 0.33
+  },
+  {
+    svg: `
+      <svg viewBox="0 0 100 100">
+        <g>
+          <ellipse cx="50" cy="20" rx="8" ry="22" fill="#b993f7" />
+          <ellipse cx="50" cy="80" rx="8" ry="22" fill="#b993f7" />
+          <ellipse cx="20" cy="50" rx="22" ry="8" fill="#b993f7" />
+          <ellipse cx="80" cy="50" rx="22" ry="8" fill="#b993f7" />
+          <ellipse cx="30" cy="30" rx="10" ry="18" transform="rotate(-45 30 30)" fill="#bca0e6" />
+          <ellipse cx="70" cy="30" rx="10" ry="18" transform="rotate(45 70 30)" fill="#bca0e6" />
+          <ellipse cx="30" cy="70" rx="10" ry="18" transform="rotate(45 30 70)" fill="#bca0e6" />
+          <ellipse cx="70" cy="70" rx="10" ry="18" transform="rotate(-45 70 70)" fill="#bca0e6" />
+          <circle  cx="50" cy="50" r="10" fill="#f472c9" />
+        </g>
+      </svg>
+    `,
+    probability: 0.14
+  }
+];
+
 
 // ===== Advent buttons =====
 document.querySelectorAll('.day').forEach(day => {
@@ -360,7 +422,7 @@ document.querySelectorAll('.day').forEach(day => {
 const flowersContainer = document.querySelector('.flowers');
 
 // Управляемые переменные:
-const MAX_FLOWERS = 70; // максимальное количество цветов (меняйте по желанию)
+const MAX_FLOWERS = 270; // максимальное количество цветов (меняйте по желанию)
 const FLOWER_DENSITY = 0.5; // плотность (0.1 - очень разреженно, 1 - максимально плотно)
 
 const startDay = 10;
@@ -395,6 +457,20 @@ function getRandomPosition() {
   return { top: Math.random() * 100, left: Math.random() * 100 };
 }
 
+// Функция для выбора варианта цветка с учетом коэффициентов вероятности
+function pickFlowerVariant() {
+  const total = flowerVariants.reduce((sum, v) => sum + v.probability, 0);
+  let rand = Math.random() * total;
+  for (const variant of flowerVariants) {
+    if (rand < variant.probability) {
+      return variant.svg;
+    }
+    rand -= variant.probability;
+  }
+  // fallback
+  return flowerVariants[0].svg;
+}
+
 for (let i = 0; i < MAX_FLOWERS; i++) {
   const flower = document.createElement('div');
   flower.classList.add('flower');
@@ -404,19 +480,11 @@ for (let i = 0; i < MAX_FLOWERS; i++) {
   flower.style.left = pos.left + '%';
   flower.style.transitionDelay = Math.random() * 1 + 's';
 
-  flower.innerHTML = `
-    <svg viewBox="0 0 100 100">
-      <circle class="center" cx="50" cy="50" r="12" />
-      <ellipse class="petal" cx="50" cy="20" rx="10" ry="20" />
-      <ellipse class="petal" cx="50" cy="80" rx="10" ry="20" />
-      <ellipse class="petal" cx="20" cy="50" rx="20" ry="10" />
-      <ellipse class="petal" cx="80" cy="50" rx="20" ry="10" />
-      <ellipse class="petal" cx="30" cy="30" rx="12" ry="18" transform="rotate(-45 30 30)" />
-      <ellipse class="petal" cx="70" cy="30" rx="12" ry="18" transform="rotate(45 70 30)" />
-      <ellipse class="petal" cx="30" cy="70" rx="12" ry="18" transform="rotate(45 30 70)" />
-      <ellipse class="petal" cx="70" cy="70" rx="12" ry="18" transform="rotate(-45 70 70)" />
-    </svg>
-  `;
+  // Сохраняем рандомный поворот в кастомное свойство
+  const rotation = Math.random() * 360;
+  flower.style.setProperty('--flower-rotation', `${rotation.toFixed(1)}deg`);
+
+  flower.innerHTML = pickFlowerVariant();
 
   flowersContainer.appendChild(flower);
 
@@ -459,4 +527,3 @@ document.querySelectorAll('.day').forEach(day => {
     icon.textContent = '🔒';
   }
 });
-
