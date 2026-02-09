@@ -1,3 +1,55 @@
+--- css/main.css ---
+
+/* Hide scrollbars for all elements */
+html, body, * {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== Flowers background ===== */
+.flowers {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.flower {
+  transform: scale(var(--flower-scale));
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  opacity: 0;
+  transform: scale(0.2) rotate(-20deg);
+  transition: opacity 1s ease, transform 1.2s cubic-bezier(0.23,1,0.32,1);
+  animation-name: organicSway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+
+.flower.bloomed {
+  opacity: 0.9;
+  transform: scale(1) rotate(0deg);
+}
+
+.flower svg {
+  width: 100%;
+  height: 100%;
+}
+
+.flower .petal {
+  fill: #c084fc;
+}
+
+.flower .center {
+  fill: #f472b6;
+}
+
+
 .day.valentines.active:hover {
   transform: translateY(-8px) scale(1.08);
   animation:
@@ -216,5 +268,44 @@ h1 {
       0 0 28px 12px rgba(236, 72, 153, 0.22),
       0 0 64px 18px rgba(236, 72, 153, 0.17),
       0 24px 80px 0px rgba(236, 72, 153, 0.22);
+  }
+}
+
+@keyframes organicSway {
+  0% {
+    transform:
+      translate(0px, 0px)
+      rotate(-1deg)
+      scale(var(--flower-scale));
+  }
+  20% {
+    transform:
+      translate(2px, -3px)
+      rotate(0.5deg)
+      scale(var(--flower-scale));
+  }
+  40% {
+    transform:
+      translate(-2px, -1px)
+      rotate(1deg)
+      scale(var(--flower-scale));
+  }
+  60% {
+    transform:
+      translate(1px, 2px)
+      rotate(-0.5deg)
+      scale(var(--flower-scale));
+  }
+  80% {
+    transform:
+      translate(-1px, 1px)
+      rotate(0.5deg)
+      scale(var(--flower-scale));
+  }
+  100% {
+    transform:
+      translate(0px, 0px)
+      rotate(-1deg)
+      scale(var(--flower-scale));
   }
 }
