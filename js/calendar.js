@@ -1,5 +1,5 @@
 const today = new Date();
-const currentDay = 13;
+const currentDay = today.getDate();
 
 // Добавляем коэффициенты вероятности для каждого варианта цветка
 const flowerVariants = [
