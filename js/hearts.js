@@ -24,15 +24,25 @@ function createHeart() {
   heart.style.left = x + 'px';
   heart.style.top = y + 'px';
 
+
   function fall() {
     y += speed;
     heart.style.top = y + 'px';
 
-    if (y < game.clientHeight) {
-      requestAnimationFrame(fall);
-    } else {
+    // Проверяем, полностью ли сердечко вышло за пределы игрового поля
+    const rect = heart.getBoundingClientRect();
+    const gameRect = game.getBoundingClientRect();
+    const outOfBottom = rect.top > gameRect.bottom;
+    const outOfRight = rect.left > gameRect.right;
+    const outOfLeft = rect.right < gameRect.left;
+    const outOfTop = rect.bottom < gameRect.top;
+
+    if (outOfBottom || outOfRight || outOfLeft || outOfTop) {
       heart.remove();
+      return;
     }
+
+    requestAnimationFrame(fall);
   }
 
   heart.addEventListener('click', () => {
