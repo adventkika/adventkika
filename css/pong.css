@@ -42,16 +42,43 @@ h1, .subtitle, .game-card {
 
 
 #reward {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(255,255,255,0.95);
-  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.25); /* затемнение */
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  animation: fadeIn 1s ease;
+  z-index: 5;
+  animation: fadeIn 0.8s ease;
 }
+
+.reward-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 28px;
+  padding: 28px 24px 32px;
+  max-width: 320px;
+  width: 85%;
+  text-align: center;
+
+  box-shadow:
+    0 30px 60px rgba(124, 58, 237, 0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.6);
+
+  animation: scaleIn 0.6s cubic-bezier(.2,.8,.2,1);
+}
+.reward-card p {
+  font-size: 18px;
+  color: #6b21a8;
+  line-height: 1.4;
+}
+
+.reward-card img {
+  width: 100%;
+  border-radius: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+}
+
 
 #reward img {
   max-width: 80%;
@@ -83,3 +110,13 @@ h1, .subtitle, .game-card {
   border-radius: 0;
 }
 
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
