@@ -27,7 +27,7 @@ const flowerVariants = [
           <ellipse cx="70" cy="50" rx="14" ry="18" fill="#b9a3e3" transform="rotate(90 70 50)" />
           <ellipse cx="50" cy="70" rx="14" ry="18" fill="#b9a3e3" />
           <ellipse cx="30" cy="50" rx="14" ry="18" fill="#b9a3e3" transform="rotate(90 30 50)" />
-          <circle class="center" cx="50" cy="50" r="7" fill="#a18ad6" />
+          <circle cx="50" cy="50" r="7" fill="#f4728e" />
         </g>
       </svg>
     `,
@@ -45,7 +45,7 @@ const flowerVariants = [
           <ellipse cx="70" cy="30" rx="10" ry="18" transform="rotate(45 70 30)" fill="#bca0e6" />
           <ellipse cx="30" cy="70" rx="10" ry="18" transform="rotate(45 30 70)" fill="#bca0e6" />
           <ellipse cx="70" cy="70" rx="10" ry="18" transform="rotate(-45 70 70)" fill="#bca0e6" />
-          <circle class="center" cx="50" cy="50" r="10" fill="#f9e2af" />
+          <circle  cx="50" cy="50" r="10" fill="#f472c9" />
         </g>
       </svg>
     `,
@@ -79,7 +79,7 @@ document.querySelectorAll('.day').forEach(day => {
 const flowersContainer = document.querySelector('.flowers');
 
 // Управляемые переменные:
-const MAX_FLOWERS = 70; // максимальное количество цветов (меняйте по желанию)
+const MAX_FLOWERS = 300; // максимальное количество цветов (меняйте по желанию)
 const FLOWER_DENSITY = 0.5; // плотность (0.1 - очень разреженно, 1 - максимально плотно)
 
 const startDay = 10;
@@ -136,6 +136,10 @@ for (let i = 0; i < MAX_FLOWERS; i++) {
   flower.style.top = pos.top + '%';
   flower.style.left = pos.left + '%';
   flower.style.transitionDelay = Math.random() * 1 + 's';
+
+  // Сохраняем рандомный поворот в кастомное свойство
+  const rotation = Math.random() * 360;
+  flower.style.setProperty('--flower-rotation', `${rotation.toFixed(1)}deg`);
 
   flower.innerHTML = pickFlowerVariant();
 
