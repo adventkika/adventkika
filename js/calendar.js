@@ -79,7 +79,7 @@ document.querySelectorAll('.day').forEach(day => {
 const flowersContainer = document.querySelector('.flowers');
 
 // Управляемые переменные:
-const MAX_FLOWERS = 300; // максимальное количество цветов (меняйте по желанию)
+const MAX_FLOWERS = 270; // максимальное количество цветов (меняйте по желанию)
 const FLOWER_DENSITY = 0.5; // плотность (0.1 - очень разреженно, 1 - максимально плотно)
 
 const startDay = 10;
