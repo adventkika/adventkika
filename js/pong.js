@@ -1,3 +1,21 @@
+// ===== Lose Text Animation =====
+let loseText = null;
+let loseTextAlpha = 0;
+let loseTextX = 0;
+let loseTextY = 0;
+let loseTextTimer = 0;
+const loseTextDuration = 1200; // ms
+const loseTextStrings = [
+  "Ой!",
+  "Я верю в тебя!",
+  "Лучшая девочка проиграть не может!💜",
+  "Не сдавайся!",
+  "Со мной не проиграешь!❤️",
+  "Я всегда с тобой!💖"
+];
+let loseTextString = loseTextStrings[0];
+const gameBottomOffset = 28; // px
+const loseTextFontSize = 30; // px
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let gameStarted = false;
@@ -121,11 +139,18 @@ function update() {
     }
   });
 
-  // Lose
-  if (ball.y > canvas.height) {
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height - 60;
-    ball.dy = -3;
+  // Lose (ricochet from bottom, with offset)
+  if (ball.y > canvas.height - gameBottomOffset - ball.r) {
+    // Ricochet: фиксируем позицию шарика
+    ball.dy *= -1;
+    ball.y = canvas.height - gameBottomOffset - ball.r;
+    // Place lose text at collision point (фиксированная высота)
+    loseTextX = ball.x;
+    loseTextY = ball.y + ball.r;
+    loseTextAlpha = 1;
+    loseTextTimer = Date.now();
+    // Случайный текст
+    loseTextString = loseTextStrings[Math.floor(Math.random() * loseTextStrings.length)];
   }
 
   // Win
@@ -153,18 +178,35 @@ function draw() {
   ctx.fillStyle = '#f472b6';
   ctx.fill();
 
-  // Blocks
-    blocks.forEach(b => {
-    if (!b.alive) return;
+  // Lose text animation
+  if (loseTextAlpha > 0) {
+    const elapsed = Date.now() - loseTextTimer;
+    let alpha = Math.max(0, 1 - elapsed / loseTextDuration);
+    if (alpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.font = `bold ${loseTextFontSize}px Segoe UI, sans-serif`;
+      ctx.fillStyle = '#f472b6';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top'; // верхняя граница текста
+      ctx.fillText(loseTextString, loseTextX, loseTextY);
+      ctx.restore();
+    } else {
+      loseTextAlpha = 0;
+    }
+  }
 
+  // Blocks
+  blocks.forEach(b => {
+    if (!b.alive) return;
     ctx.fillStyle = 'rgba(192,132,252,1)';
     ctx.fillRect(
-        Math.round(b.x),
-        Math.round(b.y),
-        blockSize + 1,
-        blockSize + 1
+      Math.round(b.x),
+      Math.round(b.y),
+      blockSize + 1,
+      blockSize + 1
     );
-    });
+  });
 
 }
 
