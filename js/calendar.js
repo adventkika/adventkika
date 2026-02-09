@@ -1,5 +1,5 @@
 const today = new Date();
-const currentDay = 14;
+const currentDay = 13;
 
 // Добавляем коэффициенты вероятности для каждого варианта цветка
 const flowerVariants = [
@@ -208,7 +208,7 @@ if (currentDay >= 14) {
     // Лепесток появляется за пределами экрана сверху
     petal.style.top = '-12%';
 
-    const size = 10 + Math.random() * 8;
+    const size = 22 + Math.random() * 28; // увеличено: 22–50px
     petal.style.width = size + 'px';
     petal.style.height = size + 'px';
 
@@ -237,7 +237,7 @@ if (currentDay >= 14) {
     }, (duration + 1) * 1000); // +1 секунда для гарантии ухода за экран
   }
 
-  // создаём лепестки постепенно
-  setInterval(createPetal, 900);
+  // создаём лепестки чаще для большей плотности
+  setInterval(createPetal, 200);
 }
 
