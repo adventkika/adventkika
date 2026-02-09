@@ -1,49 +1,56 @@
 const today = new Date();
 const currentDay = 14;
 
+// Добавляем коэффициенты вероятности для каждого варианта цветка
 const flowerVariants = [
-  // 8
-  `
-    <svg viewBox="0 0 100 100">
-      <circle class="center" cx="50" cy="50" r="12" />
-      <ellipse class="petal" cx="50" cy="20" rx="10" ry="20" />
-      <ellipse class="petal" cx="50" cy="80" rx="10" ry="20" />
-      <ellipse class="petal" cx="20" cy="50" rx="20" ry="10" />
-      <ellipse class="petal" cx="80" cy="50" rx="20" ry="10" />
-      <ellipse class="petal" cx="30" cy="30" rx="12" ry="18" transform="rotate(-45 30 30)" />
-      <ellipse class="petal" cx="70" cy="30" rx="12" ry="18" transform="rotate(45 70 30)" />
-      <ellipse class="petal" cx="30" cy="70" rx="12" ry="18" transform="rotate(45 30 70)" />
-      <ellipse class="petal" cx="70" cy="70" rx="12" ry="18" transform="rotate(-45 70 70)" />
-    </svg>
-  `,
-  // 4
-  `
-    <svg viewBox="0 0 100 100">
-      <g>
-        <ellipse cx="50" cy="30" rx="14" ry="18" fill="#b9a3e3" />
-        <ellipse cx="70" cy="50" rx="14" ry="18" fill="#b9a3e3" transform="rotate(90 70 50)" />
-        <ellipse cx="50" cy="70" rx="14" ry="18" fill="#b9a3e3" />
-        <ellipse cx="30" cy="50" rx="14" ry="18" fill="#b9a3e3" transform="rotate(90 30 50)" />
-        <circle class="center" cx="50" cy="50" r="7" fill="#a18ad6" />
-      </g>
-    </svg>
-  `,
-  // 5
-  `
-    <svg viewBox="0 0 100 100">
-      <g>
-        <ellipse cx="50" cy="20" rx="8" ry="22" fill="#b993f7" />
-        <ellipse cx="50" cy="80" rx="8" ry="22" fill="#b993f7" />
-        <ellipse cx="20" cy="50" rx="22" ry="8" fill="#b993f7" />
-        <ellipse cx="80" cy="50" rx="22" ry="8" fill="#b993f7" />
-        <ellipse cx="30" cy="30" rx="10" ry="18" transform="rotate(-45 30 30)" fill="#bca0e6" />
-        <ellipse cx="70" cy="30" rx="10" ry="18" transform="rotate(45 70 30)" fill="#bca0e6" />
-        <ellipse cx="30" cy="70" rx="10" ry="18" transform="rotate(45 30 70)" fill="#bca0e6" />
-        <ellipse cx="70" cy="70" rx="10" ry="18" transform="rotate(-45 70 70)" fill="#bca0e6" />
-        <circle class="center" cx="50" cy="50" r="10" fill="#f9e2af" />
-      </g>
-    </svg>
-  `
+  {
+    svg: `
+      <svg viewBox="0 0 100 100">
+        <circle class="center" cx="50" cy="50" r="12" />
+        <ellipse class="petal" cx="50" cy="20" rx="10" ry="20" />
+        <ellipse class="petal" cx="50" cy="80" rx="10" ry="20" />
+        <ellipse class="petal" cx="20" cy="50" rx="20" ry="10" />
+        <ellipse class="petal" cx="80" cy="50" rx="20" ry="10" />
+        <ellipse class="petal" cx="30" cy="30" rx="12" ry="18" transform="rotate(-45 30 30)" />
+        <ellipse class="petal" cx="70" cy="30" rx="12" ry="18" transform="rotate(45 70 30)" />
+        <ellipse class="petal" cx="30" cy="70" rx="12" ry="18" transform="rotate(45 30 70)" />
+        <ellipse class="petal" cx="70" cy="70" rx="12" ry="18" transform="rotate(-45 70 70)" />
+      </svg>
+    `,
+    probability: 0.53 // коэффициент вероятности появления
+  },
+  {
+    svg: `
+      <svg viewBox="0 0 100 100">
+        <g>
+          <ellipse cx="50" cy="30" rx="14" ry="18" fill="#b9a3e3" />
+          <ellipse cx="70" cy="50" rx="14" ry="18" fill="#b9a3e3" transform="rotate(90 70 50)" />
+          <ellipse cx="50" cy="70" rx="14" ry="18" fill="#b9a3e3" />
+          <ellipse cx="30" cy="50" rx="14" ry="18" fill="#b9a3e3" transform="rotate(90 30 50)" />
+          <circle class="center" cx="50" cy="50" r="7" fill="#a18ad6" />
+        </g>
+      </svg>
+    `,
+    probability: 0.33
+  },
+  {
+    svg: `
+      <svg viewBox="0 0 100 100">
+        <g>
+          <ellipse cx="50" cy="20" rx="8" ry="22" fill="#b993f7" />
+          <ellipse cx="50" cy="80" rx="8" ry="22" fill="#b993f7" />
+          <ellipse cx="20" cy="50" rx="22" ry="8" fill="#b993f7" />
+          <ellipse cx="80" cy="50" rx="22" ry="8" fill="#b993f7" />
+          <ellipse cx="30" cy="30" rx="10" ry="18" transform="rotate(-45 30 30)" fill="#bca0e6" />
+          <ellipse cx="70" cy="30" rx="10" ry="18" transform="rotate(45 70 30)" fill="#bca0e6" />
+          <ellipse cx="30" cy="70" rx="10" ry="18" transform="rotate(45 30 70)" fill="#bca0e6" />
+          <ellipse cx="70" cy="70" rx="10" ry="18" transform="rotate(-45 70 70)" fill="#bca0e6" />
+          <circle class="center" cx="50" cy="50" r="10" fill="#f9e2af" />
+        </g>
+      </svg>
+    `,
+    probability: 0.14
+  }
 ];
 
 
@@ -107,6 +114,20 @@ function getRandomPosition() {
   return { top: Math.random() * 100, left: Math.random() * 100 };
 }
 
+// Функция для выбора варианта цветка с учетом коэффициентов вероятности
+function pickFlowerVariant() {
+  const total = flowerVariants.reduce((sum, v) => sum + v.probability, 0);
+  let rand = Math.random() * total;
+  for (const variant of flowerVariants) {
+    if (rand < variant.probability) {
+      return variant.svg;
+    }
+    rand -= variant.probability;
+  }
+  // fallback
+  return flowerVariants[0].svg;
+}
+
 for (let i = 0; i < MAX_FLOWERS; i++) {
   const flower = document.createElement('div');
   flower.classList.add('flower');
@@ -116,9 +137,7 @@ for (let i = 0; i < MAX_FLOWERS; i++) {
   flower.style.left = pos.left + '%';
   flower.style.transitionDelay = Math.random() * 1 + 's';
 
- flower.innerHTML =
-  flowerVariants[Math.floor(Math.random() * flowerVariants.length)];
-
+  flower.innerHTML = pickFlowerVariant();
 
   flowersContainer.appendChild(flower);
 
