@@ -1,0 +1,171 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+h1 {
+  color: #6b21a8;
+  margin-bottom: 40px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(5, 120px);
+  gap: 24px;
+}
+
+.day {
+  animation: appear 0.6s ease forwards;
+  opacity: 0;
+}
+
+.day.locked:nth-child(1) { animation-delay: 0.1s; }
+.day.locked:nth-child(2) { animation-delay: 0.2s; }
+.day.locked:nth-child(3) { animation-delay: 0.3s; }
+.day.locked:nth-child(4) { animation-delay: 0.4s; }
+.day.locked:nth-child(5) { animation-delay: 0.5s; }
+
+.day:nth-child(1) { animation-delay: 0.1s; }
+.day:nth-child(2) { animation-delay: 0.2s; }
+.day:nth-child(3) { animation-delay: 0.3s; }
+.day:nth-child(4) { animation-delay: 0.4s; }
+.day:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.day {
+  position: relative;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+  text-decoration: none;
+  font-size: 32px;
+  font-weight: 600;
+  color: #7c3aed;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.icon {
+  position: absolute;
+  bottom: 12px;
+  font-size: 20px;
+}
+
+.day.active {
+  box-shadow: 0 0 25px rgba(167, 139, 250, 0.9);
+}
+
+
+.day.valentines.active {
+  animation: appear 0.6s ease forwards 0.5s, pulse 2s infinite 0.1s;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.6); }
+  50% { box-shadow: 0 0 40px rgba(236, 72, 153, 0.9); }
+  100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.6); }
+}
+
+.day.locked {
+  animation: appearLocked 0.6s ease forwards;
+  filter: grayscale(0.2);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3), 0 10px 25px rgba(124, 58, 237, 0.15);
+}
+
+.day.valentines.locked {
+  animation: appearLocked 0.6s ease forwards 0.5s, valentinesGlow 3s infinite 0.1s;
+  filter: none;
+  box-shadow:
+    0 0 0 3px rgba(236, 72, 153, 0.6),
+    0 0 25px rgba(236, 72, 153, 0.4);
+}
+@keyframes appearLocked {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes valentinesGlow {
+  0% { box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.4), 0 0 20px rgba(236, 72, 153, 0.3); }
+  50% { box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.8), 0 0 35px rgba(236, 72, 153, 0.6); }
+  100% { box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.4), 0 0 20px rgba(236, 72, 153, 0.3); }
+}
+
+.day:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.35);
+}
+
+.day.locked:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.35);
+}
+
+.day.valentines.locked:hover {
+  transform: translateY(-8px) scale(1.08);
+  animation: valentinesHoverPulse 2s ease infinite, appearLocked 0.6s ease forwards 0.5s, none;
+}
+
+@keyframes valentinesHoverPulse {
+  0% {
+    box-shadow:
+      0 0 0 3px rgba(236, 72, 153, 0.52),
+      0 0 28px 12px rgba(236, 72, 153, 0.22),
+      0 0 64px 18px rgba(236, 72, 153, 0.17),
+      0 24px 80px 0px rgba(236, 72, 153, 0.22);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(236, 72, 153, 0.62),
+      0 0 44px 20px rgba(236, 72, 153, 0.32),
+      0 0 90px 28px rgba(236, 72, 153, 0.22),
+      0 32px 110px 0px rgba(236, 72, 153, 0.28);
+  }
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(236, 72, 153, 0.52),
+      0 0 28px 12px rgba(236, 72, 153, 0.22),
+      0 0 64px 18px rgba(236, 72, 153, 0.17),
+      0 24px 80px 0px rgba(236, 72, 153, 0.22);
+  }
+}
+
+@keyframes valentinesHover {
+  from {
+    box-shadow:
+      0 0 0 3px rgba(236, 72, 153, 0.4),
+      0 0 25px rgba(236, 72, 153, 0.15);
+  }
+  to {
+    box-shadow:
+      0 0 0 3px rgba(236, 72, 153, 0.52),
+      0 0 28px 12px rgba(236, 72, 153, 0.22),
+      0 0 64px 18px rgba(236, 72, 153, 0.17),
+      0 24px 80px 0px rgba(236, 72, 153, 0.22);
+  }
+}
