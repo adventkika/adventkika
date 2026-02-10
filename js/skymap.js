@@ -2,15 +2,19 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 // === НАСТРОЙКИ ===
-const ANALYSIS_SIZE = 1024*8; // фиксированное разрешение анализа
-const BRIGHTNESS_THRESHOLD = 128; // порог яркости для определения звезды
+const ANALYSIS_SIZE = 1024 * 8; // фиксированное разрешение анализа
+const BRIGHTNESS_THRESHOLD = 128;
 const STAR_CLUSTER_MAX = 24;
-
-
 
 // === ДАННЫЕ ===
 let stars = [];
 let lines = [];
+const SPECIAL_STAR = {
+  x: 0.4724, 
+  y: 0.4232,
+  text: 'И среди всего этого неба ты была самой яркой'
+};
+
 
 const img = new Image();
 img.src = 'img/photos/skymap.gif';
@@ -33,6 +37,7 @@ function analyzeImage() {
   const temp = document.createElement('canvas');
   temp.width = ANALYSIS_SIZE;
   temp.height = ANALYSIS_SIZE;
+
   const tctx = temp.getContext('2d', {
     willReadFrequently: true
   });
@@ -41,14 +46,10 @@ function analyzeImage() {
 
   const imageData = tctx.getImageData(0, 0, ANALYSIS_SIZE, ANALYSIS_SIZE);
   const data = imageData.data;
-
   const visited = new Uint8Array(ANALYSIS_SIZE * ANALYSIS_SIZE);
 
   function isBright(i) {
-    return (
-      (data[i] + data[i + 1] + data[i + 2]) / 3 >
-      BRIGHTNESS_THRESHOLD
-    );
+    return (data[i] + data[i + 1] + data[i + 2]) / 3 > BRIGHTNESS_THRESHOLD;
   }
 
   function floodFill(x0, y0) {
@@ -84,7 +85,6 @@ function analyzeImage() {
     return cluster;
   }
 
-  // СБРОС
   stars = [];
   lines = [];
 
@@ -97,9 +97,7 @@ function analyzeImage() {
       if (!isBright(i)) continue;
 
       const cluster = floodFill(x, y);
-      //if (cluster.length < 1) continue;
 
-      // ЦЕНТР КЛАСТЕРА
       let sx = 0, sy = 0;
       cluster.forEach(p => {
         sx += p.x;
@@ -132,58 +130,109 @@ function analyzeImage() {
 function resizeCanvas() {
   const wrapper = canvas.parentElement;
   const cssSize = wrapper.clientWidth;
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-  // CSS размер
   canvas.style.width = cssSize + 'px';
   canvas.style.height = cssSize + 'px';
 
-  // Реальный размер
   canvas.width = Math.round(cssSize * dpr);
   canvas.height = Math.round(cssSize * dpr);
 
-  // Масштабируем систему координат
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.imageSmoothingEnabled = false;
 }
 
 // ======================
 // ОТРИСОВКА
 // ======================
 function draw() {
-  const size = canvas.width;
-  ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, size, size);
+  const wrapper = canvas.parentElement;
+  const cssSize = wrapper.clientWidth;
 
-  // КРУГ-КАРТА
+  ctx.clearRect(0, 0, cssSize, cssSize);
+
+  const cx = cssSize / 2;
+  const cy = cssSize / 2;
+  const radius = cssSize / 2 - 2;
+
+  // === ГРАНИЦА КАРТЫ ===
   ctx.beginPath();
-  ctx.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // СОЗВЕЗДИЯ
+  // === СМЕЩЕНИЕ КАРТЫ В ЦЕНТР ===
+  ctx.save();
+  ctx.translate(cx - cssSize / 2, cy - cssSize / 2);
+
+  // === СОЗВЕЗДИЯ ===
   ctx.strokeStyle = 'rgba(255,255,255,0.6)';
   ctx.lineWidth = 1;
 
   lines.forEach(line => {
     ctx.beginPath();
     line.forEach((p, i) => {
-      const x = p.x * size;
-      const y = p.y * size;
+      const x = p.x * cssSize;
+      const y = p.y * cssSize;
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
     ctx.stroke();
   });
 
-  // ЗВЁЗДЫ
+  // === ЗВЁЗДЫ ===
+  const starRadius = Math.max(1, Math.min(2.2, cssSize * 0.003));
+
   stars.forEach(star => {
     ctx.beginPath();
-    const starRadius = Math.max(1, Math.min(2.2, cssSize * 0.003));
-    const r = Math.max(0.8, Math.min(1.6, size * 0.002));
-ctx.arc(star.x * size, star.y * size, r, 0, Math.PI * 2);
-
+    ctx.arc(
+      star.x * cssSize,
+      star.y * cssSize,
+      starRadius,
+      0,
+      Math.PI * 2
+    );
     ctx.fillStyle = 'rgba(255,255,255,0.95)';
     ctx.fill();
   });
+
+  // === ОСОБАЯ ЗВЕЗДА ===
+const sx = SPECIAL_STAR.x * cssSize;
+const sy = SPECIAL_STAR.y * cssSize;
+
+// свечение
+const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 20);
+glow.addColorStop(0, 'rgba(255,255,255,0.9)');
+glow.addColorStop(0.4, 'rgba(249,168,212,0.6)');
+glow.addColorStop(1, 'rgba(249,168,212,0)');
+
+ctx.beginPath();
+ctx.arc(sx, sy, 20, 0, Math.PI * 2);
+ctx.fillStyle = glow;
+ctx.fill();
+
+// сама звезда
+ctx.beginPath();
+ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+ctx.fillStyle = '#ffffff';
+ctx.fill();
+
+
+  ctx.restore();
 }
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / rect.width;
+  const my = (e.clientY - rect.top) / rect.height;
+
+  const dx = mx - SPECIAL_STAR.x;
+  const dy = my - SPECIAL_STAR.y;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist < 0.03) {
+    alert(SPECIAL_STAR.text);
+  }
+});
+
