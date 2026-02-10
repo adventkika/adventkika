@@ -232,7 +232,18 @@ canvas.addEventListener('click', e => {
   const dist = Math.hypot(dx, dy);
 
   if (dist < 0.03) {
-    alert(SPECIAL_STAR.text);
+    showStarModal();
   }
 });
+
+const modal = document.getElementById('starModal');
+
+function showStarModal() {
+  modal.classList.add('show');
+}
+
+modal.addEventListener('click', () => {
+  modal.classList.remove('show');
+});
+
 
