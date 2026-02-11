@@ -50,56 +50,113 @@ function createCard(data, position) {
 
 function enableSwipe(card) {
   let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+
+  const DRAG_START_THRESHOLD = 10;
 
   card.addEventListener("pointerdown", e => {
     startX = e.clientX;
+    currentX = e.clientX;
+    isDragging = true;
     card.style.transition = "none";
+    card.setPointerCapture(e.pointerId);
   });
 
-card.addEventListener("pointermove", e => {
-  if (!startX) return;
-  const deltaX = e.clientX - startX;
+  card.addEventListener("pointermove", e => {
+    if (!isDragging) return;
 
-  card.style.transform = `
-    translate(calc(-50% + ${deltaX}px), -50%)
-    rotate(${deltaX / 15}deg)
-  `;
-});
+    currentX = e.clientX;
+    const deltaX = currentX - startX;
 
+    if (Math.abs(deltaX) < DRAG_START_THRESHOLD) return;
+
+    const rotate = deltaX / 18;
+
+    card.style.transform = `
+      translate(calc(-50% + ${deltaX}px), -50%)
+      rotate(${rotate}deg)
+    `;
+  });
 
   card.addEventListener("pointerup", e => {
-    const deltaX = e.clientX - startX;
-    card.style.transition = "0.3s";
+    if (!isDragging) return;
+    isDragging = false;
 
-    if (deltaX > 120) {
-      swipe(card, "right");
-    } else if (deltaX < -120) {
-      swipe(card, "left");
-    } else {
-     card.style.transform = `
-        translate(-50%, -50%)
-    `;
+    const deltaX = e.clientX - startX;
+    const screenWidth = window.innerWidth;
+
+    // 🔥 порог = половина ширины экрана
+    const SWIPE_THRESHOLD = screenWidth * 0.3;
+
+    card.style.transition = "1s cubic-bezier(.22,1,.36,1)";
+
+    // если меньше половины экрана — возвращаем
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
+      card.style.transform = "translate(-50%, -50%) rotate(0deg)";
+      return;
     }
 
-    startX = 0;
+    swipe(card, deltaX > 0 ? "right" : "left");
   });
 }
 
+
+
 function swipe(card, direction) {
-  card.style.transform =
-    direction === "right"
-      ? "translateX(500px) rotate(20deg)"
-      : "translateX(-500px) rotate(-20deg)";
+  const offX = direction === "right" ? window.innerWidth : -window.innerWidth;
+  const offY = -window.innerHeight * 0.15;
+  const rotate = direction === "right" ? 25 : -25;
+
+  card.style.transition = "0.6s cubic-bezier(.22,1,.36,1)";
+  card.style.transform = `
+    translate(calc(-50% + ${offX}px), calc(-50% + ${offY}px))
+    rotate(${rotate}deg)
+  `;
+  card.style.opacity = "0";
 
   setTimeout(() => {
+    card.remove(); // удаляем только верхнюю
+
     currentIndex++;
-    if (currentIndex < cardsData.length) {
-      renderStack();
-    } else {
-      container.innerHTML =
-        "<div class='card'>Это только начало нашей истории 💜</div>";
-    }
-  }, 300);
+
+    updateStack(); // плавно обновляем позиции
+
+  }, 200);
 }
+
+function updateStack() {
+  const cards = container.querySelectorAll(".card");
+
+  cards.forEach((card, index) => {
+    const offset = index * 12;
+
+    card.style.transition = "0.5s cubic-bezier(.22,1,.36,1)";
+    card.style.transform = `
+      translate(-50%, calc(-50% - ${offset}px))
+    `;
+    card.style.zIndex = 100 - index;
+
+    if (index === 0) {
+      enableSwipe(card);
+    }
+  });
+
+  // Добавляем новую карточку в низ стопки
+  const newIndex = currentIndex + visibleCards - 1;
+
+  if (newIndex < cardsData.length) {
+    const newCard = createCard(cardsData[newIndex], visibleCards - 1);
+    newCard.style.opacity = "0";
+    container.appendChild(newCard);
+
+    requestAnimationFrame(() => {
+      newCard.style.transition = "0.3s ease";
+      newCard.style.opacity = "1";
+    });
+  }
+}
+
+
 
 renderStack();
