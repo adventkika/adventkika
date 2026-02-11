@@ -1,8 +1,9 @@
 const letter = document.getElementById('letter');
 const textElement = document.getElementById('text');
 const hint = document.getElementById('hint');
+letter.classList.add('clickable');
 
-const message = `Я долго думал, что сказать и с чего начать, поэтому решил просто написать тебе письмо.
+const message = `Я долго думал, что сказать и с чего начать, поэтому решил просто написать то что я думаю.
 Мне сложно выразить словами, как много ты для меня значишь, но я всё равно попробую.
 
 Ты — самое прекрасное, что произошло в моей жизни.
@@ -75,7 +76,7 @@ function typeWriter() {
     textElement.appendChild(cursor);
 
     index++;
-    setTimeout(typeWriter, 1);
+    setTimeout(typeWriter, 0.1);
 
   } else {
     cursor.remove();
@@ -86,6 +87,7 @@ function typeWriter() {
 letter.addEventListener('click', () => {
   if (started) return;
   started = true;
+  letter.classList.remove('clickable');
   hint.style.opacity = '0';
   typeWriter();
 });
@@ -93,4 +95,18 @@ letter.addEventListener('click', () => {
 seal.addEventListener('animationend', () => {
   console.log('Анимация закончилась');
 });
+
+const modal = document.getElementById('foreverModal');
+
+seal.addEventListener('click', () => {
+  modal.classList.add('active');
+});
+
+
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    modal.classList.remove('active');
+  }
+});
+
 
