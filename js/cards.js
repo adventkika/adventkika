@@ -1,10 +1,25 @@
 const cardsData = [
-  { text: "Сегодня 14 день." },
-  { text: "И он для меня особенный." },
-  { text: "Потому что я хочу сказать тебе кое-что важное." },
-  { text: "Ты — самый важный человек в моей жизни." },
-  { text: "И я выбираю тебя. Каждый день." }
+  { type: "text", text: "Сегодня 14 день." },
+
+  { 
+    type: "choice",
+    question: "Как ты сегодня себя чувствуешь?",
+    options: ["Счастлива 💜", "Немного устала", "Очень влюблена 😌"]
+  },
+
+  { 
+    type: "reveal",
+    preview: "Хочешь узнать секрет?",
+    hidden: "Ты — самое лучшее, что случилось со мной."
+  },
+
+  {
+    type: "promise",
+    text: "Я обещаю выбирать тебя каждый день.",
+    button: "Я верю тебе 💜"
+  }
 ];
+
 
 const container = document.getElementById("card-container");
 
@@ -26,7 +41,10 @@ function renderStack() {
 function createCard(data, position) {
   const card = document.createElement("div");
   card.classList.add("card");
-  card.innerText = data.text;
+
+  card.style.top = "50%";
+  card.style.left = "50%";
+  card.style.zIndex = 100 - position;
 
   const offset = position * 12;
 
@@ -34,10 +52,67 @@ function createCard(data, position) {
     translate(-50%, calc(-50% - ${offset}px))
   `;
 
-  card.style.top = "50%";
-  card.style.left = "50%";
+  // 🔥 Рендер по типу карточки
+  if (data.type === "text") {
+    card.innerHTML = `<p>${data.text}</p>`;
+  }
 
-  card.style.zIndex = 100 - position;
+if (data.type === "choice") {
+  card.innerHTML = `
+    <div class="card-content">
+      <p class="question">${data.question}</p>
+      <div class="options">
+        ${data.options.map(opt => 
+          `<button class="option-btn">${opt}</button>`
+        ).join("")}
+      </div>
+    </div>
+  `;
+
+  card.querySelectorAll(".option-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      card.querySelectorAll(".option-btn").forEach(b => 
+        b.classList.remove("selected")
+      );
+      btn.classList.add("selected");
+    });
+  });
+}
+
+
+  if (data.type === "promise") {
+    card.innerHTML = `
+      <p>${data.text}</p>
+      <button class="main-btn">${data.button}</button>
+    `;
+
+    card.querySelector(".main-btn").addEventListener("click", () => {
+      card.classList.add("accepted");
+    });
+  }
+
+if (data.type === "reveal") {
+  card.innerHTML = `
+    <div class="card-content">
+      <p class="preview">${data.preview}</p>
+      <p class="hidden-text blurred">${data.hidden}</p>
+    </div>
+  `;
+
+  const hidden = card.querySelector(".hidden-text");
+
+  hidden.addEventListener("pointerdown", e => {
+    e.stopPropagation(); // ❗ блокируем запуск свайпа
+  });
+
+  hidden.addEventListener("click", e => {
+    e.stopPropagation(); // ❗ чтобы свайп не сработал
+    hidden.classList.remove("blurred");
+    hidden.classList.add("revealed");
+  });
+}
+
+
 
   if (position === 0) {
     enableSwipe(card);
@@ -45,6 +120,7 @@ function createCard(data, position) {
 
   return card;
 }
+
 
 
 
