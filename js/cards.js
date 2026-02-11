@@ -126,36 +126,43 @@ function swipe(card, direction) {
 }
 
 function updateStack() {
-  const cards = container.querySelectorAll(".card");
+  const cards = Array.from(container.querySelectorAll(".card"));
 
-  cards.forEach((card, index) => {
-    const offset = index * 12;
+  cards.forEach((card, i) => {
+    const position = cards.length - 1 - i; 
+    // 🔥 переворачиваем индекс — теперь нижняя карта = 2, средняя = 1, верхняя = 0
+
+    const offset = position * 12;
 
     card.style.transition = "0.5s cubic-bezier(.22,1,.36,1)";
     card.style.transform = `
       translate(-50%, calc(-50% - ${offset}px))
     `;
-    card.style.zIndex = 100 - index;
 
-    if (index === 0) {
+    card.style.zIndex = 100 - position;
+
+    if (position === 0) {
       enableSwipe(card);
     }
   });
 
-  // Добавляем новую карточку в низ стопки
+  // Добавляем новую карточку в самый низ
   const newIndex = currentIndex + visibleCards - 1;
 
   if (newIndex < cardsData.length) {
     const newCard = createCard(cardsData[newIndex], visibleCards - 1);
     newCard.style.opacity = "0";
-    container.appendChild(newCard);
+
+    // 👇 вставляем В НАЧАЛО, а не в конец
+    container.insertBefore(newCard, container.firstChild);
 
     requestAnimationFrame(() => {
-      newCard.style.transition = "0.3s ease";
+      newCard.style.transition = "0.4s ease";
       newCard.style.opacity = "1";
     });
   }
 }
+
 
 
 
