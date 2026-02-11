@@ -1,11 +1,15 @@
 const cardsData = [
   { type: "text", text: "Сегодня 14 день." },
 
-  { 
-    type: "choice",
-    question: "Как ты сегодня себя чувствуешь?",
-    options: ["Счастлива 💜", "Немного устала", "Очень влюблена 😌"]
-  },
+{
+  type: "question",
+  question: "Ты выберешь меня?",
+  options: [
+    { text: "Да 💜", result: "Я знал, что ты скажешь да. Ты — моя судьба." },
+    { text: "Конечно!", result: "И я выбираю тебя. Каждый день." },
+    { text: "Всегда.", result: "Тогда это начало нашей бесконечной истории." }
+  ]
+},
 
   { 
     type: "reveal",
@@ -56,6 +60,50 @@ function createCard(data, position) {
   if (data.type === "text") {
     card.innerHTML = `<p>${data.text}</p>`;
   }
+
+  if (data.type === "question") {
+  card.innerHTML = `
+    <div class="card-content question-card">
+      <p class="question-text">${data.question}</p>
+      <div class="options">
+        ${data.options
+          .map(
+            (opt, index) =>
+              `<button class="option-btn" data-index="${index}">
+                ${opt.text}
+              </button>`
+          )
+          .join("")}
+      </div>
+      <div class="answer"></div>
+    </div>
+  `;
+
+  const buttons = card.querySelectorAll(".option-btn");
+  const answerBlock = card.querySelector(".answer");
+  const optionsBlock = card.querySelector(".options");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+
+      const index = btn.dataset.index;
+      const resultText = data.options[index].result;
+
+      // ✨ Анимация выбора
+      optionsBlock.classList.add("fade-out");
+
+      setTimeout(() => {
+        optionsBlock.style.display = "none";
+
+        answerBlock.innerText = resultText;
+        answerBlock.classList.add("show-answer");
+
+      }, 300);
+    });
+  });
+}
+
 
 if (data.type === "choice") {
   card.innerHTML = `
@@ -132,11 +180,15 @@ function enableSwipe(card) {
   const DRAG_START_THRESHOLD = 10;
 
   card.addEventListener("pointerdown", e => {
+
+    // ❗ если нажали на кнопку — не запускаем свайп
+    if (e.target.closest(".option-btn")) return;
+
     startX = e.clientX;
     currentX = e.clientX;
     isDragging = true;
+
     card.style.transition = "none";
-    card.setPointerCapture(e.pointerId);
   });
 
   card.addEventListener("pointermove", e => {
@@ -161,13 +213,10 @@ function enableSwipe(card) {
 
     const deltaX = e.clientX - startX;
     const screenWidth = window.innerWidth;
+    const SWIPE_THRESHOLD = screenWidth * 0.25;
 
-    // 🔥 порог = половина ширины экрана
-    const SWIPE_THRESHOLD = screenWidth * 0.3;
+    card.style.transition = "0.6s cubic-bezier(.22,1,.36,1)";
 
-    card.style.transition = "1s cubic-bezier(.22,1,.36,1)";
-
-    // если меньше половины экрана — возвращаем
     if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
       card.style.transform = "translate(-50%, -50%) rotate(0deg)";
       return;
@@ -176,7 +225,6 @@ function enableSwipe(card) {
     swipe(card, deltaX > 0 ? "right" : "left");
   });
 }
-
 
 
 function swipe(card, direction) {
