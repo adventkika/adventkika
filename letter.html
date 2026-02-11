@@ -1,258 +1,54 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Письмо для тебя 💌</title>
+  <meta charset="UTF-8">
+  <title>13 февраля — Письмо 💌</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- Рукописный шрифт -->
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 
-<style>
-:root {
-  --bg1: #f5d0fe;
-  --bg2: #ddd6fe;
-  --envelope: #f3e8ff;
-  --envelope-shadow: #d8b4fe;
-  --flap: #e9d5ff;
-  --paper: #faf5ff;
-  --text: #3b0764;
-  --accent: #a855f7;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(135deg, var(--bg1), var(--bg2));
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Inter', sans-serif;
-  overflow: hidden;
-}
-
-.container {
-  text-align: center;
-  padding: 20px;
-  max-width: 600px;
-}
-
-h1 {
-  font-weight: 400;
-  font-size: clamp(22px, 5vw, 28px);
-  margin-bottom: 10px;
-}
-
-.subtitle {
-  font-size: clamp(14px, 4vw, 16px);
-  opacity: 0.6;
-  margin-bottom: 40px;
-}
-
-.scene {
-  position: relative;
-  width: min(90vw, 420px);
-  height: min(60vw, 280px);
-  margin: auto;
-}
-
-/* ===== ENVELOPE ===== */
-
-.envelope {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  perspective: 1200px;
-}
-
-.envelope-body {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: var(--envelope);
-  border-radius: 14px;
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.25),
-    inset 0 0 40px rgba(192,132,252,0.25);
-  overflow: hidden;
-  z-index: 2;
-}
-
-/* Боковые части */
-.envelope-body::before,
-.envelope-body::after {
-  content: "";
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  background: var(--envelope-shadow);
-  top: 0;
-}
-.envelope-body::before {
-  left: 0;
-  clip-path: polygon(0 0, 100% 50%, 0 100%);
-}
-.envelope-body::after {
-  right: 0;
-  clip-path: polygon(100% 0, 0 50%, 100% 100%);
-}
-
-/* Нижние треугольники */
-.envelope-bottom {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  z-index: 4;
-  pointer-events: none;
-}
-.triangle {
-  position: absolute;
-  width: 34%;
-  height: 38%;
-  background: var(--envelope-shadow);
-  bottom: 0;
-  z-index: 4;
-  clip-path: polygon(50% 100%, 0 0, 100% 0);
-}
-.triangle.left {
-  left: 0;
-  transform: translateX(-8%);
-}
-.triangle.center {
-  left: 33%;
-  width: 34%;
-  background: var(--envelope);
-  z-index: 5;
-  clip-path: polygon(50% 100%, 0 0, 100% 0);
-}
-.triangle.right {
-  right: 0;
-  transform: translateX(8%);
-}
-
-/* Клапан */
-.flap {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: var(--flap);
-  clip-path: polygon(0 0, 50% 60%, 100% 0);
-  transform-origin: top;
-  transition: transform 0.8s ease;
-  z-index: 6;
-}
-
-/* ===== LETTER ===== */
-.letter {
-  position: absolute;
-  width: 88%;
-  height: 120%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, 100%); /* спрятано внутри */
-  background: var(--paper);
-  border-radius: 14px;
-  padding: 30px 24px;
-  color: var(--text);
-  transition: transform 1s cubic-bezier(.22,1,.36,1);
-  z-index: 3;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
-}
-
-/* 1 этап — письмо выезжает вверх из-под треугольников */
-.open .letter {
-  transform: translate(-50%, -120%);
-  z-index: 7;
-  transition-delay: 0.5s;
-}
-
-/* 2 этап — письмо опускается в центр */
-.final .letter {
-  transform: translate(-50%, -50%);
-  z-index: 7;
-}
-
-/* Появление текста */
-.letter p {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s, transform 0.5s;
-}
-.final .letter p {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.3s;
-}
-
-/* ===== OPEN ===== */
-.open .flap {
-  transform: rotateX(180deg);
-}
-
-/* Небольшое дыхание */
-@keyframes breathe {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-.envelope:not(.open) {
-  animation: breathe 3s ease-in-out infinite;
-}
-
-.hint {
-  margin-top: 25px;
-  font-size: 14px;
-  opacity: 0.5;
-  transition: opacity 0.3s ease;
-}
-.open ~ .hint {
-  opacity: 0;
-}
-</style>
+  <link rel="stylesheet" href="css/letter.css">
 </head>
 <body>
 
-<div class="container">
-  <h1>Я написал тебе письмо</h1>
-  <p class="subtitle">Иногда самые важные слова хочется сказать тихо</p>
+<div class="page">
+<div class="wrapper">
+  <div class="letter" id="letter">
+    <div id="text"></div>
+    <div class="seal" id="seal">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <radialGradient id="waxGradient" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#ff4d6d"/>
+          <stop offset="60%" stop-color="#c9184a"/>
+          <stop offset="100%" stop-color="#7b0f2b"/>
+        </radialGradient>
+      </defs>
 
-  <div class="scene">
-    <div class="envelope" id="envelope">
-      <div class="envelope-body">
-        <div class="letter">
-          <h2>Привет.</h2>
-          <p>Я долго думал, как сказать это правильно.</p>
-          <p>И понял, что правильно — это просто честно.</p>
-          <p>Каждый день рядом с тобой делает меня спокойнее и счастливее.</p>
-          <p>И я жду завтрашнего дня сильнее, чем любых звёзд на этом небе.</p>
-        </div>
-      </div>
-      <div class="envelope-bottom">
+      <!-- Воск -->
+      <circle cx="100" cy="100" r="85" fill="url(#waxGradient)" />
 
-      </div>
-      <div class="flap"></div>
-    </div>
+      <!-- Неровности края -->
+      <circle cx="100" cy="100" r="90"
+              fill="none"
+              stroke="#8b102f"
+              stroke-width="6"
+              stroke-dasharray="6 8"
+              opacity="0.4"/>
+
+      <!-- Сердце внутри -->
+      <path d="M100 135
+               C 40 90, 60 50, 100 75
+               C 140 50, 160 90, 100 135 Z"
+            fill="#7a0026"/>
+    </svg>
+  </div>
   </div>
 
-  <div class="hint">Нажми на конверт 💌</div>
+  <p class="hint" id="hint">Нажми, чтобы я начал писать…</p>
+</div>
 </div>
 
-<script>
-const envelope = document.getElementById('envelope');
-let isOpen = false;
-
-envelope.addEventListener('click', () => {
-  if (isOpen) return;
-  envelope.classList.add('open');
-  isOpen = true;
-  setTimeout(() => {
-    envelope.classList.add('final');
-  }, 1400);
-});
-</script>
-
+<script src="js/letter.js"></script>
 </body>
 </html>
