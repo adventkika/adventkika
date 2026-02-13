@@ -389,3 +389,47 @@ h1 {
 h1.fade-out-title {
   animation: fadeOutTitle 0.8s ease forwards !important;
 }
+
+/* ===== Flower explosion ===== */
+
+.flower.exploding {
+  animation: none !important;
+  pointer-events: none;
+}
+
+.flower-particle {
+  position: fixed;
+  width: 8px;
+  height: 16px;
+  background: #f472b6;
+  border-radius: 50% 50% 50% 50%;
+  pointer-events: none;
+  opacity: 0.9;
+  animation: explodePetal 900ms cubic-bezier(.2,.7,.3,1) forwards;
+}
+
+@keyframes explodePetal {
+  0% {
+    transform: translate(0,0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) rotate(540deg) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* лёгкое исчезновение самого цветка */
+@keyframes flowerFadeOut {
+  to {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+.flower.boomed {
+  animation: flowerFadeOut 0.5s ease forwards !important;
+}

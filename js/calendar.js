@@ -1,7 +1,7 @@
 const today = new Date();
-const currentDay = 20;
+const currentDay = 10;
 let petalsInterval = null;
-
+let flowersUnlocked = false;
 
 // Добавляем коэффициенты вероятности для каждого варианта цветка
 const flowerVariants = [
@@ -263,31 +263,97 @@ document.addEventListener('keydown', (e) => {
 });
 
 function triggerSecretEffect() {
-    const title = document.querySelector('h1');
+
+  const title = document.querySelector('h1');
   if (title) {
     title.style.animation = 'none';
     void title.offsetWidth;
     title.classList.add('fade-out-title');
   }
 
-  document.querySelectorAll('.day').forEach((card, index) => {
+  const cards = document.querySelectorAll('.day');
+
+  cards.forEach((card, index) => {
     setTimeout(() => {
 
-      // Отключаем все текущие анимации
       card.style.animation = 'none';
-
-      // Принудительный reflow (чтобы браузер применил reset)
       void card.offsetWidth;
-
-      // Добавляем нашу анимацию
       card.classList.add('fade-out');
+
+      // Если это последняя карточка — ждём её исчезновения
+      if (index === cards.length - 1) {
+        card.addEventListener('animationend', () => {
+          activateFlowerLayer();
+        }, { once: true });
+      }
 
     }, index * 100);
   });
 
-  // Останавливаем падение лепестков
-  if (typeof petalsInterval !== 'undefined') {
+  if (petalsInterval) {
     clearInterval(petalsInterval);
+    petalsInterval = null;
   }
 
+  flowersUnlocked = true;
+}
+
+function activateFlowerLayer() {
+  const flowersContainer = document.querySelector('.flowers');
+  if (!flowersContainer) return;
+
+  flowersContainer.style.pointerEvents = 'auto';
+  flowersContainer.style.zIndex = '2';
+
+  enableFlowerExplosions();
+}
+
+function enableFlowerExplosions() {
+
+  document.querySelectorAll('.flower').forEach(flower => {
+
+    flower.addEventListener('click', (e) => {
+      if (!flowersUnlocked || flower.classList.contains('boomed')) return;
+
+      explodeFlower(flower);
+    });
+
+  });
+}
+
+function explodeFlower(flower) {
+
+  flower.classList.add('exploding');
+
+  const rect = flower.getBoundingClientRect();
+  const centerX = rect.left + rect.width/2;
+  const centerY = rect.top + rect.height/2;
+
+  const PARTICLES = 12 + Math.floor(Math.random()*6);
+
+  for (let i = 0; i < PARTICLES; i++) {
+
+    const petal = document.createElement('div');
+    petal.className = 'flower-particle';
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 40 + Math.random()*80;
+
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance - 40;
+
+    petal.style.left = centerX + 'px';
+    petal.style.top = centerY + 'px';
+    petal.style.setProperty('--x', `${x}px`);
+    petal.style.setProperty('--y', `${y}px`);
+
+    document.body.appendChild(petal);
+
+    setTimeout(() => petal.remove(), 900);
+  }
+
+  // исчезновение самого цветка
+  setTimeout(() => {
+    flower.classList.add('boomed');
+  }, 80);
 }
