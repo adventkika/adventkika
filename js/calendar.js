@@ -1,7 +1,11 @@
 const today = new Date();
-const currentDay = 10;
+const currentDay = 20;
 let petalsInterval = null;
 let flowersUnlocked = false;
+let totalFlowers = 0;
+let explodedFlowers = 0;
+let finalShown = false;
+let secretMode = false;
 
 // Добавляем коэффициенты вероятности для каждого варианта цветка
 const flowerVariants = [
@@ -299,37 +303,68 @@ function triggerSecretEffect() {
 }
 
 function activateFlowerLayer() {
+
+  secretMode = true;
+  console.log('🔓 Секретный режим активирован');
+
   const flowersContainer = document.querySelector('.flowers');
   if (!flowersContainer) return;
 
   flowersContainer.style.pointerEvents = 'auto';
   flowersContainer.style.zIndex = '2';
 
+   removePhysicallyHiddenFlowers();
+
+  // 🔥 считаем РЕАЛЬНО доступные цветы
+  totalFlowers = document.querySelectorAll('.flower.bloomed').length;
+  explodedFlowers = 0;
+
+  console.log('🎯 Реально цветов для взрыва:', totalFlowers);
+
   enableFlowerExplosions();
+}
+
+function removePhysicallyHiddenFlowers() {
+
+  const flowers = document.querySelectorAll('.flower.bloomed:not(.boomed)');
+
+  flowers.forEach(flower => {
+    const rect = flower.getBoundingClientRect();
+
+    if (
+      rect.bottom > window.innerHeight ||
+      rect.right > window.innerWidth
+    ) {
+      console.log('🧹 Удалён уехавший цветок');
+      flower.remove();
+    }
+  });
+
 }
 
 function enableFlowerExplosions() {
 
-  document.querySelectorAll('.flower').forEach(flower => {
+  document.querySelectorAll('.flower.bloomed').forEach(flower => {
 
-    flower.addEventListener('click', (e) => {
-      if (!flowersUnlocked || flower.classList.contains('boomed')) return;
+flower.addEventListener('click', (e) => {
 
-      explodeFlower(flower);
-    });
+  explodeFlower(flower);
+});
 
   });
 }
 
 function explodeFlower(flower) {
 
+  if (flower.classList.contains('boomed')) return;
+
   flower.classList.add('exploding');
 
   const rect = flower.getBoundingClientRect();
-  const centerX = rect.left + rect.width/2;
-  const centerY = rect.top + rect.height/2;
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
 
-  const PARTICLES = 12 + Math.floor(Math.random()*6);
+  const PARTICLES = 12 + Math.floor(Math.random() * 6);
 
   for (let i = 0; i < PARTICLES; i++) {
 
@@ -337,7 +372,7 @@ function explodeFlower(flower) {
     petal.className = 'flower-particle';
 
     const angle = Math.random() * Math.PI * 2;
-    const distance = 40 + Math.random()*80;
+    const distance = 40 + Math.random() * 80;
 
     const x = Math.cos(angle) * distance;
     const y = Math.sin(angle) * distance - 40;
@@ -352,8 +387,175 @@ function explodeFlower(flower) {
     setTimeout(() => petal.remove(), 900);
   }
 
-  // исчезновение самого цветка
-  setTimeout(() => {
-    flower.classList.add('boomed');
-  }, 80);
+  // запускаем fade-out
+  flower.classList.add('boomed');
+  
+flower.addEventListener('animationend', () => {
+
+  flower.remove();
+  explodedFlowers++;
+
+  console.log('🌸 Лопнуто:', explodedFlowers);
+  console.log('🎯 Всего нужно:', totalFlowers);
+
+  checkAllFlowersExploded();
+
+}, { once: true });
 }
+function checkAllFlowersExploded() {
+
+  const remaining = document.querySelectorAll('.flower.bloomed').length;
+
+  if (remaining === 0) {
+    showFinalImage();
+  }
+}
+
+function showFinalImage() {
+
+  if (finalShown) return;
+  finalShown = true;
+
+  console.log('🎉 ФИНАЛЬНАЯ АНИМАЦИЯ ЗАПУЩЕНА');
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'final-image-wrapper';
+
+  const img = document.createElement('img');
+  img.src = 'img/photos/kinich.png';
+  img.className = 'final-image';
+
+  wrapper.appendChild(img);
+  document.body.appendChild(wrapper);
+
+  spawnMiniImages();
+}
+
+function spawnMiniImages() {
+
+  const MINI_COUNT = 300;
+
+  // 📂 список возможных файлов
+  const miniImages = [
+    'img/photos/mango1.png',
+    'img/photos/mango2.png',
+    'img/photos/mango3.png',
+    'img/photos/mango4.png',
+    'img/photos/mango5.png',
+    'img/photos/mango6.png',
+    'img/photos/mango7.png',
+    'img/photos/mango8.png',
+    'img/photos/mango9.png'
+  ];
+
+  for (let i = 0; i < MINI_COUNT; i++) {
+
+    const mini = document.createElement('img');
+
+    // 🎲 случайная картинка из списка
+    const randomSrc =
+      miniImages[Math.floor(Math.random() * miniImages.length)];
+
+    mini.src = randomSrc;
+    mini.className = 'mini-final-image';
+
+    // 🎲 случайная позиция
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
+
+    mini.style.left = x + 'px';
+    mini.style.top = y + 'px';
+
+    // 🎲 случайный размер
+    const randomSize = 60 + Math.random() * 80; 
+    // от 60px до 140px
+    mini.style.width = randomSize + 'px';
+
+    // 🎲 случайная задержка появления
+    mini.style.animationDelay = (Math.random() * 0.6) + 's';
+
+    document.body.appendChild(mini);
+  }
+}
+
+function removeOffscreenFlowers() {
+
+  const flowers = document.querySelectorAll('.flower.bloomed');
+  let removed = 0;
+
+  flowers.forEach(flower => {
+
+    const rect = flower.getBoundingClientRect();
+
+    const isOutside =
+      rect.bottom < 0 ||
+      rect.top > window.innerHeight ||
+      rect.right < 0 ||
+      rect.left > window.innerWidth;
+
+    if (isOutside) {
+      flower.remove();
+      removed++;
+    }
+
+  });
+
+  console.log('🧹 Удалено внеэкранных цветов:', removed);
+}
+
+document.addEventListener('keydown', (e) => {
+
+  if (e.key.toLowerCase() !== 'd') return;
+
+  console.log('====== 🔍 DEBUG ОСТАВШИХСЯ ЦВЕТОВ ======');
+
+  const remaining = document.querySelectorAll('.flower.bloomed:not(.boomed)');
+
+  console.log('🌸 Осталось:', remaining.length);
+
+  remaining.forEach((flower, index) => {
+
+    const rect = flower.getBoundingClientRect();
+    const style = getComputedStyle(flower);
+
+    const isVisible =
+      rect.width > 0 &&
+      rect.height > 0 &&
+      rect.bottom > 0 &&
+      rect.top < window.innerHeight &&
+      rect.right > 0 &&
+      rect.left < window.innerWidth &&
+      style.opacity !== '0' &&
+      style.display !== 'none' &&
+      style.visibility !== 'hidden';
+
+    console.log(`--- Цветок ${index + 1} ---`);
+    console.log('📍 top:', rect.top);
+    console.log('📍 left:', rect.left);
+    console.log('📏 width:', rect.width);
+    console.log('📏 height:', rect.height);
+    console.log('👀 Видим в окне?', isVisible);
+
+    // 🔥 временно подсветим его
+    flower.style.outline = '3px solid red';
+    flower.style.zIndex = '9999';
+
+  });
+
+});
+
+document.addEventListener('keydown', (e) => {
+
+  if (e.key.toLowerCase() !== 'x') return;
+
+  if (!secretMode) {return;}
+
+  const remaining = document.querySelectorAll('.flower.bloomed:not(.boomed)');
+
+  remaining.forEach((flower, index) => {
+    setTimeout(() => {
+      explodeFlower(flower);
+    }, index * 10); // каскадный взрыв
+  });
+
+});
