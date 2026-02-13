@@ -262,3 +262,27 @@ user-select: none;
   gap: 20px;
   width: 100%;
 }
+
+
+.unlocked {
+  animation: unlockPulse 0.6s ease;
+}
+
+@keyframes unlockPulse {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.03); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.shake {
+  animation: cardShake 0.35s ease;
+}
+
+@keyframes cardShake {
+  0%   { transform: translate(-50%, -50%) translateX(0); }
+  20%  { transform: translate(-50%, -50%) translateX(-6px); }
+  40%  { transform: translate(-50%, -50%) translateX(6px); }
+  60%  { transform: translate(-50%, -50%) translateX(-4px); }
+  80%  { transform: translate(-50%, -50%) translateX(4px); }
+  100% { transform: translate(-50%, -50%) translateX(0); }
+}

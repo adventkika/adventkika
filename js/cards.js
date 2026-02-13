@@ -61,7 +61,10 @@ function createCard(data, position) {
     card.innerHTML = `<p>${data.text}</p>`;
   }
 
-  if (data.type === "question") {
+if (data.type === "question") {
+
+  card.dataset.locked = "true"; // 🔒 блокируем свайп
+
   card.innerHTML = `
     <div class="card-content question-card">
       <p class="question-text">${data.question}</p>
@@ -90,7 +93,6 @@ function createCard(data, position) {
       const index = btn.dataset.index;
       const resultText = data.options[index].result;
 
-      // ✨ Анимация выбора
       optionsBlock.classList.add("fade-out");
 
       setTimeout(() => {
@@ -98,6 +100,13 @@ function createCard(data, position) {
 
         answerBlock.innerText = resultText;
         answerBlock.classList.add("show-answer");
+
+        // 🔓 разблокируем свайп
+        card.dataset.locked = "false";
+
+        // 💜 лёгкий импульс, чтобы показать что можно свайпнуть
+        card.classList.add("unlocked");
+        setTimeout(() => card.classList.remove("unlocked"), 600);
 
       }, 300);
     });
@@ -140,6 +149,9 @@ if (data.type === "choice") {
   }
 
 if (data.type === "reveal") {
+
+  card.dataset.locked = "true";
+
   card.innerHTML = `
     <div class="card-content">
       <p class="preview">${data.preview}</p>
@@ -149,15 +161,28 @@ if (data.type === "reveal") {
 
   const hidden = card.querySelector(".hidden-text");
 
-  hidden.addEventListener("pointerdown", e => {
-    e.stopPropagation(); // ❗ блокируем запуск свайпа
-  });
+  const revealHandler = (e) => {
+    e.stopPropagation();
 
-  hidden.addEventListener("click", e => {
-    e.stopPropagation(); // ❗ чтобы свайп не сработал
+    // убираем блюр
     hidden.classList.remove("blurred");
     hidden.classList.add("revealed");
-  });
+
+    // разблокируем свайп
+    card.dataset.locked = "false";
+
+    // делаем текст обычным
+    hidden.style.pointerEvents = "none";
+    hidden.classList.remove("hidden-text");
+
+    // удаляем обработчик
+    hidden.removeEventListener("click", revealHandler);
+
+    card.classList.add("unlocked");
+    setTimeout(() => card.classList.remove("unlocked"), 600);
+  };
+
+  hidden.addEventListener("click", revealHandler);
 }
 
 
@@ -177,25 +202,45 @@ function enableSwipe(card) {
   let currentX = 0;
   let isDragging = false;
 
-  const DRAG_START_THRESHOLD = 10;
+  const DRAG_START_THRESHOLD = 15;
 
-  card.addEventListener("pointerdown", e => {
+card.addEventListener("pointerdown", e => {
 
-    // ❗ если нажали на кнопку — не запускаем свайп
-    if (e.target.closest(".option-btn")) return;
+  const isOption = e.target.closest(".option-btn");
+  const isHidden = e.target.closest(".hidden-text");
 
-    startX = e.clientX;
-    currentX = e.clientX;
-    isDragging = true;
+  // ❗ если нажали на кнопку ответа — не свайпаем
+  if (isOption) return;
 
-    card.style.transition = "none";
-  });
+  // ❗ если нажали на скрытый текст И карточка ещё заблокирована — не свайпаем
+  if (isHidden && card.dataset.locked === "true") return;
+
+  startX = e.clientX;
+  currentX = e.clientX;
+  isDragging = true;
+
+  card.style.transition = "none";
+});
 
   card.addEventListener("pointermove", e => {
     if (!isDragging) return;
 
     currentX = e.clientX;
     const deltaX = currentX - startX;
+
+    // 🔒 если карточка заблокирована
+    if (card.dataset.locked === "true") {
+
+      // только если реально тянут
+      if (Math.abs(deltaX) > DRAG_START_THRESHOLD) {
+        card.classList.remove("shake");
+        void card.offsetWidth;
+        card.classList.add("shake");
+        isDragging = false;
+      }
+
+      return;
+    }
 
     if (Math.abs(deltaX) < DRAG_START_THRESHOLD) return;
 
