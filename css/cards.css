@@ -4,10 +4,28 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(180deg, #e9d5ff, #a855f7);
   font-family: 'Cormorant Garamond', serif;
   overflow: hidden;
   overscroll-behavior: none;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  transition: opacity 1.2s ease;
+}
+
+/* Текущий активный фон */
+body::before {
+  opacity: 1;
+}
+
+/* Новый фон (поверх) */
+body::after {
+  opacity: 0;
 }
 
 .app {
@@ -285,4 +303,43 @@ user-select: none;
   60%  { transform: translate(-50%, -50%) translateX(-4px); }
   80%  { transform: translate(-50%, -50%) translateX(4px); }
   100% { transform: translate(-50%, -50%) translateX(0); }
+}
+
+/* Слой звёзд */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+/* Одна звезда */
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+.timer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 2s ease;
 }

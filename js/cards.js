@@ -24,7 +24,8 @@ const cardsData = [
   }
 ];
 
-
+const START_DATE = new Date("2023-08-14T00:00:00");
+let isDarkLayerActive = false;
 const container = document.getElementById("card-container");
 
 let currentIndex = 0;
@@ -296,7 +297,15 @@ function swipe(card, direction) {
   setTimeout(() => {
     card.remove(); // удаляем только верхнюю
 
-    currentIndex++;
+  currentIndex++;
+  updateBackground();
+
+  if (currentIndex >= cardsData.length) {
+  setTimeout(() => {
+    createStars();
+    startTimer();
+  }, 2000); // ждём завершения затемнения
+}
 
     updateStack(); // плавно обновляем позиции
 
@@ -341,7 +350,104 @@ function updateStack() {
   }
 }
 
+function updateBackground() {
+  const total = cardsData.length;
+  const progress = currentIndex / total;
 
+  const topLightness = 85 - progress * 55;
+  const bottomLightness = 75 - progress * 60;
 
+  const newGradient = `
+    linear-gradient(
+      to bottom,
+      hsl(270, 60%, ${topLightness}%),
+      hsl(260, 70%, ${bottomLightness}%)
+    )
+  `;
+
+  const before = document.body;
+  const after = document.body;
+
+  if (!isDarkLayerActive) {
+    document.body.style.setProperty("--next-bg", newGradient);
+    document.body.style.setProperty("--next-opacity", "1");
+  }
+
+  // напрямую задаём фону псевдоэлемента
+  const style = document.createElement("style");
+  style.innerHTML = `
+    body::after {
+      background: ${newGradient};
+      opacity: 1;
+    }
+  `;
+  document.head.appendChild(style);
+
+  setTimeout(() => {
+    const resetStyle = document.createElement("style");
+    resetStyle.innerHTML = `
+      body::before {
+        background: ${newGradient};
+      }
+      body::after {
+        opacity: 0;
+      }
+    `;
+    document.head.appendChild(resetStyle);
+  }, 1200);
+}
+
+function createStars() {
+  const starsContainer = document.createElement("div");
+  starsContainer.classList.add("stars");
+  document.body.appendChild(starsContainer);
+
+  for (let i = 0; i < 120; i++) {
+    const star = document.createElement("div");
+    star.classList.add("star");
+
+    star.style.top = Math.random() * 100 + "%";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.animationDelay = Math.random() * 3 + "s";
+
+    starsContainer.appendChild(star);
+  }
+
+  requestAnimationFrame(() => {
+    starsContainer.style.opacity = "1";
+  });
+}
+
+function startTimer() {
+  const timer = document.createElement("div");
+  timer.classList.add("timer");
+  document.body.appendChild(timer);
+
+  function update() {
+    const now = new Date();
+    const diff = now - START_DATE;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    timer.innerHTML = `
+      <div>Мы вместе уже</div>
+      <div style="font-size:34px; margin-top:10px;">
+        ${days} дней<br>
+        ${hours} часов ${minutes} минут ${seconds} секунд
+      </div>
+    `;
+  }
+
+  update();
+  setInterval(update, 1000);
+
+  requestAnimationFrame(() => {
+    timer.style.opacity = "1";
+  });
+}
 
 renderStack();
+updateBackground();
