@@ -2,7 +2,7 @@ const game = document.getElementById('game');
 const counter = document.getElementById('counter');
 
 
-let score = 0;
+let score = 240;
 
 // Настраиваемые цели и сообщения
 const goals = [
