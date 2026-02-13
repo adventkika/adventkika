@@ -1,5 +1,7 @@
 const today = new Date();
-const currentDay = today.getDate();
+const currentDay = 20;
+let petalsInterval = null;
+
 
 // Добавляем коэффициенты вероятности для каждого варианта цветка
 const flowerVariants = [
@@ -238,6 +240,54 @@ if (currentDay >= 14) {
   }
 
   // создаём лепестки чаще для большей плотности
-  setInterval(createPetal, 200);
+  petalsInterval = setInterval(createPetal, 200);
 }
 
+
+// ===== Secret keyboard code: kika =====
+
+let secretInput = '';
+const secretCode = 'kika';
+
+document.addEventListener('keydown', (e) => {
+  secretInput += e.key.toLowerCase();
+
+  // оставляем только последние 4 символа
+  if (secretInput.length > secretCode.length) {
+    secretInput = secretInput.slice(-secretCode.length);
+  }
+
+  if (secretInput === secretCode) {
+    triggerSecretEffect();
+  }
+});
+
+function triggerSecretEffect() {
+    const title = document.querySelector('h1');
+  if (title) {
+    title.style.animation = 'none';
+    void title.offsetWidth;
+    title.classList.add('fade-out-title');
+  }
+
+  document.querySelectorAll('.day').forEach((card, index) => {
+    setTimeout(() => {
+
+      // Отключаем все текущие анимации
+      card.style.animation = 'none';
+
+      // Принудительный reflow (чтобы браузер применил reset)
+      void card.offsetWidth;
+
+      // Добавляем нашу анимацию
+      card.classList.add('fade-out');
+
+    }, index * 100);
+  });
+
+  // Останавливаем падение лепестков
+  if (typeof petalsInterval !== 'undefined') {
+    clearInterval(petalsInterval);
+  }
+
+}

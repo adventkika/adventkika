@@ -356,3 +356,36 @@ h1 {
       rotate(var(--flower-rotation, 0deg));
   }
 }
+
+/* ===== Secret kika animation ===== */
+
+@keyframes fadeOutCards {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+}
+
+.day.fade-out {
+  animation: fadeOutCards 0.6s ease forwards !important;
+  pointer-events: none;
+}
+
+@keyframes fadeOutTitle {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+h1.fade-out-title {
+  animation: fadeOutTitle 0.8s ease forwards !important;
+}
