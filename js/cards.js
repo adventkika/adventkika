@@ -164,22 +164,21 @@ if (data.type === "reveal") {
   const revealHandler = (e) => {
     e.stopPropagation();
 
-    // убираем блюр
+    // запускаем анимацию
     hidden.classList.remove("blurred");
     hidden.classList.add("revealed");
 
     // разблокируем свайп
     card.dataset.locked = "false";
 
-    // делаем текст обычным
-    hidden.style.pointerEvents = "none";
-    hidden.classList.remove("hidden-text");
-
-    // удаляем обработчик
-    hidden.removeEventListener("click", revealHandler);
-
     card.classList.add("unlocked");
     setTimeout(() => card.classList.remove("unlocked"), 600);
+
+    // 🔥 ждём завершения transition
+    hidden.addEventListener("transitionend", () => {
+      hidden.style.pointerEvents = "none";
+      hidden.removeEventListener("click", revealHandler);
+    }, { once: true });
   };
 
   hidden.addEventListener("click", revealHandler);
