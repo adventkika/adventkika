@@ -7,6 +7,8 @@ body {
   font-family: 'Cormorant Garamond', serif;
   overflow: hidden;
   overscroll-behavior: none;
+  --current-bg: linear-gradient(to bottom, hsl(270,60%,85%), hsl(260,70%,75%));
+  --next-bg: var(--current-bg);
 }
 
 body::before,
@@ -18,14 +20,18 @@ body::after {
   transition: opacity 1.2s ease;
 }
 
-/* Текущий активный фон */
 body::before {
+  background: var(--current-bg);
   opacity: 1;
 }
 
-/* Новый фон (поверх) */
 body::after {
+  background: var(--next-bg);
   opacity: 0;
+}
+
+body.bg-transitioning::after {
+  opacity: 1;
 }
 
 .app {

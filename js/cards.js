@@ -24,6 +24,9 @@ const cardsData = [
   }
 ];
 
+
+let isBackgroundTransitioning = false;
+let pendingBackgroundProgress = null;
 const START_DATE = new Date("2024-08-29T23:00:00");
 let isDarkLayerActive = false;
 const container = document.getElementById("card-container");
@@ -348,8 +351,18 @@ function updateStack() {
 }
 
 function updateBackground() {
+
   const total = cardsData.length;
   const progress = currentIndex / total;
+
+  // если уже идёт анимация — просто запоминаем
+  if (isBackgroundTransitioning) {
+    pendingBackgroundProgress = progress;
+    return;
+  }
+
+  const body = document.body;
+  isBackgroundTransitioning = true;
 
   const topLightness = 85 - progress * 55;
   const bottomLightness = 75 - progress * 60;
@@ -362,38 +375,10 @@ function updateBackground() {
     )
   `;
 
-  const before = document.body;
-  const after = document.body;
-
-  if (!isDarkLayerActive) {
-    document.body.style.setProperty("--next-bg", newGradient);
-    document.body.style.setProperty("--next-opacity", "1");
-  }
-
-  // напрямую задаём фону псевдоэлемента
-  const style = document.createElement("style");
-  style.innerHTML = `
-    body::after {
-      background: ${newGradient};
-      opacity: 1;
-    }
-  `;
-  document.head.appendChild(style);
-
-  setTimeout(() => {
-    const resetStyle = document.createElement("style");
-    resetStyle.innerHTML = `
-      body::before {
-        background: ${newGradient};
-      }
-      body::after {
-        opacity: 0;
-      }
-    `;
-    document.head.appendChild(resetStyle);
-  }, 1200);
+  // применяем новый фон во второй слой
+  body.style.setProperty('--next-bg', newGradient);
+  body.classList.add('bg-transitioning');
 }
-
 function createStars() {
   const starsContainer = document.createElement("div");
   starsContainer.classList.add("stars");
@@ -517,5 +502,30 @@ function startShootingStars() {
   randomInterval();
 }
 
+document.body.addEventListener('transitionend', (e) => {
+
+  if (!document.body.classList.contains('bg-transitioning')) return;
+  if (e.propertyName !== 'opacity') return;
+
+  const body = document.body;
+
+  // переносим новый фон в основной
+  const nextBg = getComputedStyle(body).getPropertyValue('--next-bg');
+  body.style.setProperty('--current-bg', nextBg);
+
+  body.classList.remove('bg-transitioning');
+
+  isBackgroundTransitioning = false;
+
+  // если во время анимации был ещё свайп
+  if (pendingBackgroundProgress !== null) {
+    const saved = pendingBackgroundProgress;
+    pendingBackgroundProgress = null;
+
+    // запускаем новую смену
+    updateBackground(saved);
+  }
+});
+
 renderStack();
-updateBackground();
+
