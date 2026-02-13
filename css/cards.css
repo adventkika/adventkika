@@ -311,24 +311,28 @@ user-select: none;
   inset: 0;
   pointer-events: none;
   z-index: -1;
-  opacity: 0;
-  transition: opacity 2s ease;
 }
 
-/* Одна звезда */
 .star {
   position: absolute;
-  width: 2px;
-  height: 2px;
   background: white;
   border-radius: 50%;
   opacity: 0;
-  animation: twinkle 3s infinite ease-in-out;
+  transition: opacity 3s ease; /* скорость появления */
+}
+
+.star.visible {
+  opacity: 1;
+}
+
+.star.twinkle {
+  animation: twinkle 4s ease-in-out infinite;
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 
 .timer {

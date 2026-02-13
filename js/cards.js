@@ -399,20 +399,36 @@ function createStars() {
   starsContainer.classList.add("stars");
   document.body.appendChild(starsContainer);
 
-  for (let i = 0; i < 120; i++) {
+  const totalStars = 200;
+  const appearDuration = 10000;
+  const fadeDuration = 3000; // должно совпадать с transition в CSS
+
+  for (let i = 0; i < totalStars; i++) {
     const star = document.createElement("div");
     star.classList.add("star");
 
     star.style.top = Math.random() * 100 + "%";
     star.style.left = Math.random() * 100 + "%";
-    star.style.animationDelay = Math.random() * 3 + "s";
+
+    const size = Math.random() * 2 + 1;
+    star.style.width = size + "px";
+    star.style.height = size + "px";
 
     starsContainer.appendChild(star);
-  }
 
-  requestAnimationFrame(() => {
-    starsContainer.style.opacity = "1";
-  });
+    const delay = Math.random() * appearDuration;
+
+    setTimeout(() => {
+      // 1️⃣ Плавное появление
+      star.classList.add("visible");
+
+      // 2️⃣ Включаем мерцание только после завершения fade-in
+      setTimeout(() => {
+        star.classList.add("twinkle");
+      }, fadeDuration);
+
+    }, delay);
+  }
 }
 
 function startTimer() {
@@ -456,7 +472,7 @@ function launchFinalScene() {
   // 2️⃣ Через 3 секунды появляется таймер
   setTimeout(() => {
     startTimer();
-  }, 3000);
+  }, 11000);
 }
 
 renderStack();
