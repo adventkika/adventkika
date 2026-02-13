@@ -340,11 +340,24 @@ user-select: none;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -40%);
-  color: white;
-  font-size: 28px;
-  font-weight: 600;
-  text-align: center;
   opacity: 0;
+
+  padding: 30px 50px;
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(255,255,255,0.1);
+
+  color: white;
+  text-align: center;
+
+  box-shadow:
+    0 0 40px rgba(255,255,255,0.08),
+    0 0 80px rgba(255,255,255,0.04);
+
   transition:
     opacity 2.5s ease,
     transform 2.5s cubic-bezier(.22,1,.36,1);
@@ -353,4 +366,95 @@ user-select: none;
 .timer.visible {
   opacity: 1;
   transform: translate(-50%, -50%);
+}
+
+/* Заголовок */
+.timer-title {
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 14px;
+}
+
+/* Основные цифры */
+.timer-count {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.6),
+    0 0 20px rgba(255,255,255,0.4);
+}
+
+/* Подпись снизу */
+.timer-sub {
+  margin-top: 18px;
+  font-size: 14px;
+  opacity: 0.6;
+  letter-spacing: 1px;
+}
+
+.shooting-star {
+  position: fixed;
+  pointer-events: none;
+  z-index: -1;
+  transform: rotate(45deg) translateX(0);
+  animation: starMove 1.8s ease-out forwards;
+}
+
+/* Движение всей звезды */
+@keyframes starMove {
+  from {
+    transform: rotate(45deg) translateX(0);
+  }
+  to {
+    transform: rotate(45deg) translateX(500px);
+  }
+}
+
+/* Голова */
+.shooting-star .head {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 8px white, 0 0 16px rgba(255,255,255,0.7);
+  animation: headFade 0.4s ease forwards 1.2s;
+}
+
+/* Голова исчезает первой */
+@keyframes headFade {
+  to { opacity: 0; }
+}
+
+/* Хвост */
+.shooting-star .tail {
+  position: absolute;
+  right: 100%; 
+  top: 50%;
+  transform: translateY(calc(-50% + 1px));
+  height: 2px;
+  width: 0;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0.9)
+  );
+
+  animation: tailGrow 0.8s ease-out forwards,
+             tailFade 0.6s ease forwards 1.3s;
+}
+
+/* Хвост вытягивается */
+@keyframes tailGrow {
+  from { width: 0; }
+  to { width: 140px; }
+}
+
+/* Хвост растворяется */
+@keyframes tailFade {
+  to { opacity: 0; }
 }

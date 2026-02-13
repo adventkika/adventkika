@@ -24,7 +24,7 @@ const cardsData = [
   }
 ];
 
-const START_DATE = new Date("2023-08-14T00:00:00");
+const START_DATE = new Date("2024-08-29T23:00:00");
 let isDarkLayerActive = false;
 const container = document.getElementById("card-container");
 
@@ -400,7 +400,7 @@ function createStars() {
   document.body.appendChild(starsContainer);
 
   const totalStars = 200;
-  const appearDuration = 10000;
+  const appearDuration = 8000;
   const fadeDuration = 3000; // должно совпадать с transition в CSS
 
   for (let i = 0; i < totalStars; i++) {
@@ -445,13 +445,18 @@ function startTimer() {
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
     const seconds = Math.floor((diff / 1000) % 60);
 
-    timer.innerHTML = `
-      <div>Мы вместе уже</div>
-      <div style="font-size:34px; margin-top:10px;">
-        ${days} дней<br>
-        ${hours} часов ${minutes} минут ${seconds} секунд
-      </div>
-    `;
+timer.innerHTML = `
+  <div class="timer-title">С той самой ночи прошло</div>
+
+  <div class="timer-count">
+    ${days} дней<br>
+    ${hours} часов ${minutes} минут ${seconds} секунд
+  </div>
+
+  <div class="timer-sub">
+    и это только начало
+  </div>
+`;
   }
 
   update();
@@ -472,7 +477,44 @@ function launchFinalScene() {
   // 2️⃣ Через 3 секунды появляется таймер
   setTimeout(() => {
     startTimer();
-  }, 11000);
+    startShootingStars();
+  }, 9000);
+}
+
+function createShootingStar() {
+  const star = document.createElement("div");
+  star.classList.add("shooting-star");
+
+  const head = document.createElement("div");
+  head.classList.add("head");
+
+  const tail = document.createElement("div");
+  tail.classList.add("tail");
+
+  star.appendChild(tail);
+  star.appendChild(head);
+
+  star.style.top = Math.random() * 40 + "%";
+  star.style.left = Math.random() * 60 + "%";
+
+  document.body.appendChild(star);
+
+  setTimeout(() => {
+    star.remove();
+  }, 2000);
+}
+
+function startShootingStars() {
+  function randomInterval() {
+    const delay = 6000 + Math.random() * 6000; // 6–12 секунд
+
+    setTimeout(() => {
+      createShootingStar();
+      randomInterval();
+    }, delay);
+  }
+
+  randomInterval();
 }
 
 renderStack();
