@@ -300,11 +300,8 @@ function swipe(card, direction) {
   currentIndex++;
   updateBackground();
 
-  if (currentIndex >= cardsData.length) {
-  setTimeout(() => {
-    createStars();
-    startTimer();
-  }, 2000); // ждём завершения затемнения
+if (currentIndex >= cardsData.length) {
+  launchFinalScene();
 }
 
     updateStack(); // плавно обновляем позиции
@@ -444,9 +441,22 @@ function startTimer() {
   update();
   setInterval(update, 1000);
 
+  // 🔥 ключевой момент — двойной requestAnimationFrame
   requestAnimationFrame(() => {
-    timer.style.opacity = "1";
+    requestAnimationFrame(() => {
+      timer.classList.add("visible");
+    });
   });
+}
+function launchFinalScene() {
+
+  // 1️⃣ Появляются звёзды
+  createStars();
+
+  // 2️⃣ Через 3 секунды появляется таймер
+  setTimeout(() => {
+    startTimer();
+  }, 3000);
 }
 
 renderStack();

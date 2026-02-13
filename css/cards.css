@@ -335,11 +335,18 @@ user-select: none;
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -40%);
   color: white;
   font-size: 28px;
   font-weight: 600;
   text-align: center;
   opacity: 0;
-  transition: opacity 2s ease;
+  transition:
+    opacity 2.5s ease,
+    transform 2.5s cubic-bezier(.22,1,.36,1);
+}
+
+.timer.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%);
 }
