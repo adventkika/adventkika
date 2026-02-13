@@ -203,23 +203,40 @@ function enableSwipe(card) {
 
   const DRAG_START_THRESHOLD = 15;
 
-card.addEventListener("pointerdown", e => {
+  function endDrag(e, isPointerUp = false) {
+    if (!isDragging) return;
+    isDragging = false;
 
-  const isOption = e.target.closest(".option-btn");
-  const isHidden = e.target.closest(".hidden-text");
+    const deltaX = (e && e.clientX !== undefined) ? e.clientX - startX : 0;
+    const screenWidth = window.innerWidth;
+    const SWIPE_THRESHOLD = screenWidth * 0.25;
 
-  // ❗ если нажали на кнопку ответа — не свайпаем
-  if (isOption) return;
+    card.style.transition = "0.6s cubic-bezier(.22,1,.36,1)";
 
-  // ❗ если нажали на скрытый текст И карточка ещё заблокирована — не свайпаем
-  if (isHidden && card.dataset.locked === "true") return;
+    if (isPointerUp && Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+      swipe(card, deltaX > 0 ? "right" : "left");
+    } else {
+      card.style.transform = "translate(-50%, -50%) rotate(0deg)";
+    }
+  }
 
-  startX = e.clientX;
-  currentX = e.clientX;
-  isDragging = true;
+  card.addEventListener("pointerdown", e => {
+    const isOption = e.target.closest(".option-btn");
+    const isHidden = e.target.closest(".hidden-text");
 
-  card.style.transition = "none";
-});
+    // ❗ если нажали на кнопку ответа — не свайпаем
+    if (isOption) return;
+
+    // ❗ если нажали на скрытый текст И карточка ещё заблокирована — не свайпаем
+    if (isHidden && card.dataset.locked === "true") return;
+
+    startX = e.clientX;
+    currentX = e.clientX;
+    isDragging = true;
+
+    card.setPointerCapture(e.pointerId);
+    card.style.transition = "none";
+  });
 
   card.addEventListener("pointermove", e => {
     if (!isDragging) return;
@@ -229,7 +246,6 @@ card.addEventListener("pointerdown", e => {
 
     // 🔒 если карточка заблокирована
     if (card.dataset.locked === "true") {
-
       // только если реально тянут
       if (Math.abs(deltaX) > DRAG_START_THRESHOLD) {
         card.classList.remove("shake");
@@ -237,7 +253,6 @@ card.addEventListener("pointerdown", e => {
         card.classList.add("shake");
         isDragging = false;
       }
-
       return;
     }
 
@@ -252,21 +267,16 @@ card.addEventListener("pointerdown", e => {
   });
 
   card.addEventListener("pointerup", e => {
-    if (!isDragging) return;
-    isDragging = false;
+    endDrag(e, true);
+    card.releasePointerCapture(e.pointerId);
+  });
 
-    const deltaX = e.clientX - startX;
-    const screenWidth = window.innerWidth;
-    const SWIPE_THRESHOLD = screenWidth * 0.25;
+  card.addEventListener("pointerleave", e => {
+    endDrag(e, false);
+  });
 
-    card.style.transition = "0.6s cubic-bezier(.22,1,.36,1)";
-
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
-      card.style.transform = "translate(-50%, -50%) rotate(0deg)";
-      return;
-    }
-
-    swipe(card, deltaX > 0 ? "right" : "left");
+  card.addEventListener("pointercancel", e => {
+    endDrag(e, false);
   });
 }
 
